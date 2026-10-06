@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام الجرس المدرسي الآلي - مدرسة أبي سعيد الكدمي</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- الشريط المتحرك للإعلانات -->
+    <div class="bg-blue-900 text-white py-2 overflow-hidden whitespace-nowrap shadow-inner">
+        <marquee id="marqueeText" scrollamount="6" class="text-lg font-semibold">
+            مرحباً بكم في مدرسة أبي سعيد الكدمي - نسعى دائماً للتميز والتطوير التقني المستمر.
+        </marquee>
+    </div>
+
+    <!-- الهيدر -->
+    <header class="bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <div class="flex items-center gap-4">
+            <img id="schoolLogo" src="https://via.placeholder.com/80" alt="شعار المدرسة" class="w-16 h-16 object-contain rounded-full border border-gray-300 bg-gray-50 p-1">
+            <div>
+                <h1 class="text-xl font-bold text-blue-900">مدرسة أبي سعيد الكدمي للتعليم الأساسي</h1>
+                <p class="text-sm text-gray-500">نظام الجرس المدرسي الآلي المطور</p>
+            </div>
+        </div>
+        <div class="text-left bg-blue-50 px-6 py-3 rounded-xl border border-blue-200">
+            <div id="currentTime" class="text-3xl font-extrabold text-blue-700 font-mono">00:00:00</div>
+            <div id="currentDate" class="text-xs text-gray-500"></div>
+        </div>
+    </header>
+
+    <!-- المحتوى الرئيسي -->
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow w-full">
+        
+        <!-- لوحة التحكم -->
+        <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 space-y-6">
+            <h2 class="text-lg font-bold text-gray-700 border-b pb-2">⚙️ إعدادات النظام</h2>
+
+            <!-- تغيير الشعار -->
+            <div>
+                <label class="block text-sm font-semibold mb-1">تغيير شعار المدرسة:</label>
+                <input type="file" id="logoInput" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            </div>
+
+            <!-- تعديل الشريط المتحرك -->
+            <div>
+                <label class="block text-sm font-semibold mb-1">نص الشريط المتحرك:</label>
+                <input type="text" id="marqueeInput" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm">
+                <button onclick="updateMarquee()" class="mt-2 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">تحديث الشريط وحفظه</button>
+            </div>
+
+            <!-- حالة الجرس الحالية -->
+            <div class="bg-gray-50 p-4 rounded-xl border text-center">
+                <span class="text-sm text-gray-500 block">الحالة الحالية:</span>
+                <span id="bellStatus" class="text-lg font-bold text-green-600">في انتظار الحصة القادمة...</span>
+            </div>
+            
+            <button onclick="triggerManualBell()" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold shadow hover:bg-emerald-700 transition">🔔 قرع الجرس يدوياً الآن</button>
+        </div>
+
+        <!-- جدول الحصص والتوقيت -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-lg font-bold text-gray-700">📅 جدول الحصص والتواقيت اليومية</h2>
+                    <button onclick="addRow('', '', '')" class="bg-green-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition">+ إضافة حصة</button>
+                </div>
+                
+                <div class="overflow-x-auto max-h-[400px] overflow-y-auto">
+                    <table class="w-full text-right border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600">
+                                <th class="p-3 border">اسم الحصة</th>
+                                <th class="p-3 border">وقت البداية</th>
+                                <th class="p-3 border">وقت النهاية</th>
+                                <th class="p-3 border text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleTable">
+                            <!-- سيتم تعبئتها تلقائياً عبر الجافاسكريبت -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="saveSchedule()" class="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition">💾 حفظ التعديلات في المتصفح</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- الفوتر -->
+    <footer class="bg-white border-t py-4 text-center text-xs text-gray-500">
+        جميع الحقوق محفوظة © مدرسة أبي سعيد الكدمي | تم التطوير بواسطة خبير التكنولوجيا والتصميم
+    </footer>
+
+    <!-- عنصر الصوت -->
+    <audio id="bellAudio" src="https://www.soundjay.com/buttons/sounds/bell-ringing-05.mp3"></audio>
+
+    <script>
+        // البيانات الافتراضية في حال عدم وجود بيانات مخزنة مسبقاً
+        const defaultSchedule = [
+            { name: "الطابور الصباحي", start: "07:15", end: "07:30" },
+            { name: "الحصة الأولى", start: "07:30", end: "08:15" },
+            { name: "الحصة الثانية", start: "08:15", end: "09:00" },
+            { name: "الفسحة", start: "09:00", end: "09:20" },
+            { name: "الحصة الثالثة", start: "09:20", end: "10:05" }
+        ];
+
+        // تحميل البيانات عند فتح الصفحة
+        window.onload = function() {
+            loadSchedule();
+            loadSettings();
+        };
+
+        // تحديث الساعة الحية والمقارنة لقرع الجرس آلياً
+        setInterval(() => {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const currentTimeStr = `${hours}:${minutes}`;
+            const currentFullTime = `${hours}:${minutes}:${seconds}`;
+
+            document.getElementById('currentTime').innerText = currentFullTime;
+            document.getElementById('currentDate').innerText = now.toLocaleDateString('ar-OM', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+            // التحقق من الجدول لقرع الجرس
+            checkBellTiming(currentTimeStr);
+        }, 1000);
+
+        function checkBellTiming(currentTimeStr) {
+            const rows = document.querySelectorAll('#scheduleTable tr');
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    const name = inputs[0].value;
+                    const startTime = inputs[1].value;
+                    const endTime = inputs[2].value;
+
+                    if (currentTimeStr === startTime || currentTimeStr === endTime) {
+                        // التأكد من عدم تكرار القرع في نفس الدقيقة بدقة
+                        if (!row.dataset.triggered || row.dataset.triggered !== currentTimeStr) {
+                            row.dataset.triggered = currentTimeStr;
+                            triggerAutoBell(name, currentTimeStr === startTime ? 'بداية' : 'نهاية');
+                        }
+                    }
+                }
+            });
+        }
+
+        function triggerAutoBell(lessonName, type) {
+            const audio = document.getElementById('bellAudio');
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("خطأ في تشغيل الصوت:", e));
+            document.getElementById('bellStatus').innerText = `🔔 جرس (${type}) - ${lessonName}`;
+            setTimeout(() => {
+                document.getElementById('bellStatus').innerText = "في انتظار الحصة القادمة...";
+            }, 6000);
+        }
+
+        // تحميل الجدول من الذاكرة المحلية
+        function loadSchedule() {
+            const saved = localStorage.getItem('abisee_schedule');
+            const schedule = saved ? JSON.parse(saved) : defaultSchedule;
+            const tbody = document.getElementById('scheduleTable');
+            tbody.innerHTML = '';
+            schedule.forEach(item => addRow(item.name, item.start, item.end));
+        }
+
+        // إضافة صف جدول
+        function addRow(name = '', start = '', end = '') {
+            const tbody = document.getElementById('scheduleTable');
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td class="p-2 border"><input type="text" value="${name}" placeholder="اسم الحصة" class="w-full bg-transparent outline-none"></td>
+                <td class="p-2 border"><input type="time" value="${start}" class="w-full bg-transparent outline-none"></td>
+                <td class="p-2 border"><input type="time" value="${end}" class="w-full bg-transparent outline-none"></td>
+                <td class="p-2 border text-center"><button onclick="this.closest('tr').remove()" class="text-red-500 font-bold hover:text-red-700">حذف</button></td>
+            `;
+            tbody.appendChild(newRow);
+        }
+
+        // حفظ الجدول والإعدادات في LocalStorage
+        function saveSchedule() {
+            const rows = document.querySelectorAll('#scheduleTable tr');
+            const schedule = [];
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length >= 2) {
+                    schedule.push({
+                        name: inputs[0].value,
+                        start: inputs[1].value,
+                        end: inputs[2].value
+                    });
+                }
+            });
+            localStorage.setItem('abisee_schedule', JSON.stringify(schedule));
+            alert('✅ تم حفظ جدول الحصص والتواقيت في المتصفح بنجاح!');
+        }
+
+        // إعدادات الشعار والشريط المتحرك
+        function loadSettings() {
+            const savedMarquee = localStorage.getItem('abisee_marquee');
+            if (savedMarquee) {
+                document.getElementById('marqueeInput').value = savedMarquee;
+                document.getElementById('marqueeText').innerText = savedMarquee;
+            } else {
+                document.getElementById('marqueeInput').value = "مرحباً بكم في مدرسة أبي سعيد الكدمي - نسعى دائماً للتميز والتطوير التقني المستمر.";
+            }
+
+            const savedLogo = localStorage.getItem('abisee_logo');
+            if (savedLogo) {
+                document.getElementById('schoolLogo').src = savedLogo;
+            }
+        }
+
+        function updateMarquee() {
+            const text = document.getElementById('marqueeInput').value;
+            document.getElementById('marqueeText').innerText = text;
+            localStorage.setItem('abisee_marquee', text);
+            alert('✅ تم تحديث وحفظ الشريط المتحرك بنجاح!');
+        }
+
+        document.getElementById('logoInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64Image = e.target.result;
+                    document.getElementById('schoolLogo').src = base64Image;
+                    localStorage.setItem('abisee_logo', base64Image);
+                    alert('✅ تم تحديث شعار المدرسة وحفظه بنجاح!');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function triggerManualBell() {
+            const audio = document.getElementById('bellAudio');
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("خطأ في تشغيل الصوت:", e));
+            document.getElementById('bellStatus').innerText = "🔔 تم قرع الجرس يدوياً!";
+            setTimeout(() => {
+                document.getElementById('bellStatus').innerText = "في انتظار الحصة القادمة...";
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
